@@ -1,28 +1,14 @@
 pipeline {
     agent any
 
-    options {
-        skipStagesAfterUnstable()
-    }
-
     tools {
         maven 'Maven'
     }
 
     stages {
-        stage('Checkout Source Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main',
-                    credentialsId: 'github-hw7-ssh',
-                    url: 'git@github.com:s3bas9221/jenkins-springboot-hw7.git'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'git --version'
-                sh 'mvn --version'
-                sh 'mvn clean test'
+                checkout scm
             }
         }
 
@@ -32,7 +18,7 @@ pipeline {
             }
         }
 
-        stage('Archive Artifacts') {
+        stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar',
                                  fingerprint: true
@@ -41,16 +27,12 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Pipeline finished.'
-        }
-
         success {
-            echo 'Build successful!'
+            echo 'Spring Boot JAR built successfully!'
         }
 
         failure {
-            echo 'Build failed!'
+            echo 'Build failed.'
         }
     }
 }
